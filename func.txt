@@ -1,0 +1,9 @@
+FUNC hello
+VARIANT a = {{"hello, everybody!";}}
+RETURN PARAM[] + a[]
+ENDFUNC
+
+VARIANT a
+a = "I want to say: "
+VARIANT res
+res = CALL hello a

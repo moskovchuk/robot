@@ -1,0 +1,6 @@
+VARIANT a
+VARIANT b
+a = 56
+b = -6
+VARIANT c
+c = a + b
