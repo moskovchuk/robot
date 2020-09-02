@@ -34,45 +34,46 @@ class TypeConverter:
     def __init__(self):
         pass
 
-    def convert(self, val, type_to):
-        try:
-            if type(val) == int:
-                if type_to == 'int':
-                    return val
-                elif type_to == 'bool':
-                    return bool(val)
-                elif type_to == 'string':
-                    return str(val)
-            elif type(val) == bool:
-                if type_to == 'int':
-                    return int(val)
-                elif type_to == 'bool':
-                    return val
-                elif type_to == 'string':
-                    return self.bool_to_string(val)
-            elif type(val) == str:
-                if type_to == 'int':
-                    return self.string_to_int(val)
-                elif type_to == 'bool':
-                    return self.string_to_bool(val)
-                elif type_to == 'string':
-                    return val
-        except InterpreterConvertError:
-            raise InterpreterConvertError('Bad convertation!')
+    def conv(self, val, type_to):
+        if type(val) == int:
+            if type_to == 'int':
+                return val
+            elif type_to == 'bool':
+                return bool(val)
+            elif type_to == 'string':
+                return str(val)
+        elif type(val) == bool:
+            if type_to == 'int':
+                return int(val)
+            elif type_to == 'bool':
+                return val
+            elif type_to == 'string':
+                return self.bool_to_string(val)
+        elif type(val) == str:
+            if type_to == 'int':
+                return self.string_to_int(val)
+            elif type_to == 'bool':
+                return self.string_to_bool(val)
+            elif type_to == 'string':
+                return val
 
+    @staticmethod
     def bool_to_string(val):
         if val:
             return 'TRUE'
         else:
             return 'FALSE'
 
+    @staticmethod
     def string_to_int(val):
-        res = re.findall(r'\d+', val)
-        if len(res) != 0:
-            return int(res)
-        else:
+        try:
+            res = int(val)
+            print ('tyt')
+            return res
+        except:
             raise InterpreterConvertError
 
+    @staticmethod
     def string_to_bool(val):
         reg = r'TRUE|FALSE'
         res = re.findall(reg, val)
@@ -872,9 +873,9 @@ class Interpreter:
         elif type2 == 'STRING':
             type2 = 'string'
         val = self.get_variant_value(variant, index)
-        if isinstance(val, dict):
+        if (len(val) == 1):
             try:
-                res = self.converter.convert(val[type1], type2)
+                res = self.converter.conv(val[0][type1], type2)
             except InterpreterConvertError:
                 sys.stderr.write(f'ConvertError\n')
                 return
@@ -882,12 +883,12 @@ class Interpreter:
                 self.symbol_table[self.scope][variant.value][index[0]][type2] = res
             elif index is not None:
                 self.symbol_table[self.scope][variant.value][index[0]][index[1]][type2] = res
-        elif isinstance(val, list):
+        elif (len(val) > 1):
             for i in range(len(val)):
                 if isinstance(val[i], list):
                     for j in range(len(val[i])):
                         try:
-                            res = self.converter.convert(val[i][j][type1], type2)
+                            res = self.converter.conv(val[i][j][type1], type2)
                         except InterpreterConvertError:
                             sys.stderr.write(f'ConvertError\n')
                             return
